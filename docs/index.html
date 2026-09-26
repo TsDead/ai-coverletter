@@ -1,171 +1,266 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Cover-Letter Generator</title>
+<title>AI Cover-Letter Generator · NOVACODE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F0F9FF; --card:#FFFFFF; --text:#0F172A; --muted:#475569; --faint:#94A3B8;
     --sky-500:#0EA5E9; --sky-600:#0284C7; --sky-700:#0369A1;
+    --bg:#F0F9FF; --bg-grad-a:#DBF1FE; --bg-grad-b:#F5FBFF;
+    --card:#FFFFFF; --text:#0F172A; --title:#0B3A54; --muted:#475569; --faint:#94A3B8;
     --border:#E0F0F8; --border-2:#D6ECF7; --muted-bg:#EFF7FB;
-    --ok:#0F766E; --bad:#DC2626;
-    --shadow:0 1px 2px rgba(2,132,199,.06), 0 10px 30px rgba(2,132,199,.08);
+    --shadow:0 1px 2px rgba(2,132,199,.06), 0 10px 30px rgba(2,132,199,.08); --bad:#DC2626;
+  }
+  [data-theme="dark"]{
+    --bg:#0A1120; --bg-grad-a:#0E2036; --bg-grad-b:#0A1120;
+    --card:#111a2b; --text:#E7EEF7; --title:#DCEBFA; --muted:#9FB2C8; --faint:#5f728a;
+    --border:#1e2c40; --border-2:#243449; --muted-bg:#16213247;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 34px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
   body{margin:0;color:var(--text);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-       font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
-       background:
-         radial-gradient(1100px 520px at 50% -180px, #DBF1FE 0%, rgba(219,241,254,0) 70%),
-         linear-gradient(180deg,#F5FBFF 0%, #F0F9FF 100%);
-       min-height:100vh}
-  .wrap{max-width:840px;margin:0 auto;padding:60px 24px 90px}
-  .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-           color:var(--sky-600);font-weight:600}
-  h1{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:10px 0 10px;color:#0B3A54}
-  .lede{color:var(--muted);margin:0 0 32px;max-width:60ch}
+       font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;
+       background:radial-gradient(1100px 520px at 50% -180px, var(--bg-grad-a) 0%, rgba(0,0,0,0) 70%),
+                  linear-gradient(180deg,var(--bg-grad-b) 0%, var(--bg) 100%);
+       transition:background .25s,color .25s}
+  .wrap{max-width:860px;margin:0 auto;padding:26px 24px 70px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}
+  .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.02em;color:var(--title);font-size:16px;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--sky-500);box-shadow:0 0 0 4px rgba(14,165,233,.18)}
+  .tools{display:flex;gap:8px}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 12px;
+       background:var(--card);border:1px solid var(--border-2);border-radius:10px;color:var(--muted);cursor:pointer;
+       font:inherit;font-size:13px;font-weight:600;transition:.15s}
+  .icon-btn:hover{border-color:var(--sky-500);color:var(--sky-600)}
+  .icon-btn svg{width:16px;height:16px}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sky-600);font-weight:600}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:10px 0 10px;color:var(--title)}
+  .lede{color:var(--muted);margin:0 0 26px;max-width:60ch}
+  .about{background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:16px 18px;margin-bottom:26px;box-shadow:var(--shadow)}
+  .about h2{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:0 0 8px;color:var(--title)}
+  .about ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px}
+  .about li{margin-bottom:4px}
   .label{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
   textarea,input,select{width:100%;background:var(--card);border:1px solid var(--border-2);border-radius:12px;
        color:var(--text);padding:13px 15px;font:inherit;font-size:14.5px;resize:vertical;transition:border-color .18s, box-shadow .18s}
-  textarea{min-height:200px;line-height:1.55}
+  textarea{min-height:190px;line-height:1.55}
   textarea::placeholder,input::placeholder{color:var(--faint)}
   textarea:focus,input:focus,select:focus{outline:none;border-color:var(--sky-500);box-shadow:0 0 0 4px rgba(14,165,233,.14)}
   select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230284C7' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
-  .keybox{background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:15px 17px;margin-bottom:26px;box-shadow:var(--shadow)}
+  .keybox{background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:15px 17px;margin-bottom:24px;box-shadow:var(--shadow)}
   .keybox .label{margin-bottom:9px;display:flex;align-items:center;gap:7px}
   .keybox a{color:var(--sky-600);text-decoration:none;font-weight:600}
   .keybox a:hover{text-decoration:underline}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
   @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .settings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  @media(max-width:620px){.settings{grid-template-columns:1fr 1fr}}
   .controls{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;align-items:flex-end}
-  .controls > div{flex:1;min-width:150px}
-  button{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;border-radius:12px;padding:12px 26px;
+  button.go{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;border-radius:12px;padding:12px 28px;
          cursor:pointer;border:1px solid var(--sky-700);background:var(--sky-700);color:#fff;transition:background .18s, transform .06s;
          box-shadow:0 6px 16px rgba(3,105,161,.24)}
-  button:hover{background:var(--sky-600)} button:active{transform:translateY(1px)}
-  button:disabled{opacity:.5;cursor:default;box-shadow:none}
-  .out{margin-top:28px;background:var(--card);border:1px solid var(--border-2);border-radius:16px;padding:22px 24px;display:none;box-shadow:var(--shadow)}
+  button.go:hover{background:var(--sky-600)} button.go:active{transform:translateY(1px)} button.go:disabled{opacity:.5;cursor:default;box-shadow:none}
+  .out{margin-top:26px;background:var(--card);border:1px solid var(--border-2);border-radius:16px;padding:22px 24px;display:none;box-shadow:var(--shadow)}
   .out.show{display:block}
   .bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
   .bar .cap{font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--sky-600);font-weight:600}
-  .copy{background:var(--muted-bg);border:1px solid var(--border-2);color:var(--sky-700);padding:7px 15px;font-size:13px;font-weight:600;box-shadow:none}
+  .copy{background:var(--muted-bg);border:1px solid var(--border-2);color:var(--sky-700);padding:7px 15px;font-size:13px;font-weight:600;border-radius:9px;cursor:pointer}
   .copy:hover{background:#E3F2FB}
-  .letter{white-space:pre-wrap;font-size:15px;line-height:1.7;color:#1E293B}
+  [data-theme="dark"] .copy{color:var(--sky-500)} [data-theme="dark"] .copy:hover{background:#1a2740}
+  .letter{white-space:pre-wrap;font-size:15px;line-height:1.7}
   .match{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:14px}
   .err{color:var(--bad);margin-top:14px;font-size:14px}
-  footer{margin-top:46px;padding-top:22px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px}
-  footer a{color:var(--muted);text-decoration:none}
-  footer a:hover{color:var(--sky-600)}
+  footer{margin-top:48px;padding-top:22px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px;
+         display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  footer a{color:var(--muted);text-decoration:none} footer a:hover{color:var(--sky-600)}
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="eyebrow">Cover-Letter Generator</div>
-  <h1>Сопроводительное письмо под вакансию</h1>
-  <p class="lede">Вставьте вакансию и резюме — модель напишет письмо под неё: подсветит совпадающие навыки, вставит нужное слово-маркер и не выдумает фактов сверх резюме. English / Русский.</p>
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>NOVACODE</div>
+    <div class="tools">
+      <button class="icon-btn" id="langBtn" aria-label="Language">RU</button>
+      <button class="icon-btn" id="themeBtn" aria-label="Theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="eyebrow" data-i18n="eyebrow">Cover-Letter Generator</div>
+  <h1 data-i18n="title">Сопроводительное письмо под вакансию</h1>
+  <p class="lede" data-i18n="lede">Вставьте вакансию и резюме — модель напишет письмо под неё: подсветит совпадающие навыки, вставит нужное слово-маркер и не выдумает фактов сверх резюме.</p>
+
+  <div class="about">
+    <h2 data-i18n="aboutTitle">Зачем это нужно</h2>
+    <ul>
+      <li data-i18n="about1">На каждую вакансию письмо пишут заново и подгоняют под неё — это 15–20 минут.</li>
+      <li data-i18n="about2">Инструмент делает это за пару секунд: под конкретную вакансию, из вашего резюме, без выдумок.</li>
+      <li data-i18n="about3">Некоторые вакансии требуют «слово-маркер» (доказать, что прочитал) — оно вставляется автоматически.</li>
+    </ul>
+  </div>
 
   <div class="keybox">
     <div class="label">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-      Ключ Groq — бесплатный, без карты · <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a> · хранится только в вашем браузере
+      <span data-i18n="keyLabel">Ключ Groq — бесплатный, без карты · хранится только в вашем браузере</span> · <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a>
     </div>
     <input id="key" type="password" placeholder="gsk_…" autocomplete="off">
   </div>
 
   <div class="grid">
-    <div>
-      <div class="label">Вакансия</div>
-      <textarea id="vacancy" placeholder="Вставьте текст вакансии…"></textarea>
-    </div>
-    <div>
-      <div class="label">Резюме</div>
-      <textarea id="cv"></textarea>
-    </div>
+    <div><div class="label" data-i18n="vacancyLabel">Вакансия</div><textarea id="vacancy" data-i18n-ph="vacancyPh" placeholder="Вставьте текст вакансии…"></textarea></div>
+    <div><div class="label" data-i18n="cvLabel">Резюме</div><textarea id="cv"></textarea></div>
+  </div>
+
+  <div class="settings">
+    <div><div class="label" data-i18n="letterLang">Язык письма</div>
+      <select id="lang"><option value="en">English</option><option value="ru">Русский</option></select></div>
+    <div><div class="label" data-i18n="toneLabel">Тон</div>
+      <select id="tone">
+        <option value="professional" data-i18n="tonePro">Деловой</option>
+        <option value="friendly" data-i18n="toneFriendly">Дружелюбный</option>
+        <option value="enthusiastic" data-i18n="toneEnth">Энергичный</option>
+      </select></div>
+    <div><div class="label" data-i18n="lengthLabel">Длина</div>
+      <select id="length">
+        <option value="short" data-i18n="lenShort">Короткое (~120 слов)</option>
+        <option value="medium" selected data-i18n="lenMed">Среднее (~180 слов)</option>
+        <option value="detailed" data-i18n="lenLong">Подробное (~230 слов)</option>
+      </select></div>
   </div>
 
   <div class="controls">
-    <div style="max-width:180px">
-      <div class="label">Язык письма</div>
-      <select id="lang"><option value="en">English</option><option value="ru">Русский</option></select>
-    </div>
-    <div>
-      <div class="label">Слово-маркер · опц.</div>
-      <input id="magic" placeholder="напр. SOLICITOUSLY">
-    </div>
-    <div style="flex:0 0 auto"><button id="go">Сгенерировать</button></div>
+    <div style="flex:1;min-width:150px"><div class="label" data-i18n="magicLabel">Слово-маркер · опц.</div><input id="magic" placeholder="напр. SOLICITOUSLY"></div>
+    <div style="flex:0 0 auto"><button class="go" id="go" data-i18n="genBtn">Сгенерировать</button></div>
   </div>
 
   <div class="err" id="err"></div>
 
   <div class="out" id="out">
-    <div class="bar"><span class="cap">Письмо</span><button class="copy" id="copy">Копировать</button></div>
+    <div class="bar"><span class="cap" data-i18n="letterCap">Письмо</span><button class="copy" id="copy" data-i18n="copyBtn">Копировать</button></div>
     <div class="letter" id="letter"></div>
     <div class="match" id="match"></div>
   </div>
 
   <footer>
-    Python · FastAPI · LLM (Groq) · вызов из браузера с вашим ключом &nbsp;·&nbsp;
-    <a href="https://github.com/TsDead/ai-coverletter" target="_blank" rel="noopener">github.com/TsDead/ai-coverletter</a> &nbsp;·&nbsp;
-    <a href="https://new-coder.ru" target="_blank" rel="noopener">new-coder.ru</a>
+    <span>© 2026 NOVACODE</span>
+    <span>Python · FastAPI · LLM (Groq) &nbsp;·&nbsp;
+      <a href="https://github.com/TsDead/ai-coverletter" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://new-coder.ru" target="_blank" rel="noopener">new-coder.ru</a></span>
   </footer>
 </div>
 
 <script>
   const $ = id => document.getElementById(id);
-  const SYSTEM = "You are a professional career assistant that writes concise, tailored cover letters. You never invent facts, skills or experience not supported by the candidate's CV. You output STRICT JSON only, with no markdown fences.";
+  const root = document.documentElement;
 
+  const I18N = {
+    ru: {
+      eyebrow:"Cover-Letter Generator", title:"Сопроводительное письмо под вакансию",
+      lede:"Вставьте вакансию и резюме — модель напишет письмо под неё: подсветит совпадающие навыки, вставит нужное слово-маркер и не выдумает фактов сверх резюме.",
+      aboutTitle:"Зачем это нужно",
+      about1:"На каждую вакансию письмо пишут заново и подгоняют под неё — это 15–20 минут.",
+      about2:"Инструмент делает это за пару секунд: под конкретную вакансию, из вашего резюме, без выдумок.",
+      about3:"Некоторые вакансии требуют «слово-маркер» (доказать, что прочитал) — оно вставляется автоматически.",
+      keyLabel:"Ключ Groq — бесплатный, без карты · хранится только в вашем браузере",
+      vacancyLabel:"Вакансия", vacancyPh:"Вставьте текст вакансии…", cvLabel:"Резюме",
+      letterLang:"Язык письма", toneLabel:"Тон", tonePro:"Деловой", toneFriendly:"Дружелюбный", toneEnth:"Энергичный",
+      lengthLabel:"Длина", lenShort:"Короткое (~120 слов)", lenMed:"Среднее (~180 слов)", lenLong:"Подробное (~230 слов)",
+      magicLabel:"Слово-маркер · опц.", genBtn:"Сгенерировать", letterCap:"Письмо", copyBtn:"Копировать", copied:"Скопировано",
+      placeholder:"Введите бесплатный ключ Groq выше и нажмите «Сгенерировать» — здесь появится письмо под вставленную вакансию.",
+      writing:"Пишу…", why:"Почему подходит: ", needKey:"Введите бесплатный ключ Groq (console.groq.com).", needVac:"Вставьте текст вакансии."
+    },
+    en: {
+      eyebrow:"Cover-Letter Generator", title:"A cover letter tailored to the job",
+      lede:"Paste a job posting and your CV — the model writes a letter for it: highlights matching skills, inserts a required marker word, and never invents facts beyond your CV.",
+      aboutTitle:"Why it is useful",
+      about1:"Each application means writing a letter from scratch and tailoring it — about 15–20 minutes.",
+      about2:"This tool does it in seconds: specific to the posting, from your CV, no fabrication.",
+      about3:"Some postings require a marker word (to prove you read them) — it is inserted automatically.",
+      keyLabel:"Groq key — free, no card · stored only in your browser",
+      vacancyLabel:"Job posting", vacancyPh:"Paste the job posting…", cvLabel:"CV / Resume",
+      letterLang:"Letter language", toneLabel:"Tone", tonePro:"Professional", toneFriendly:"Friendly", toneEnth:"Enthusiastic",
+      lengthLabel:"Length", lenShort:"Short (~120 words)", lenMed:"Medium (~180 words)", lenLong:"Detailed (~230 words)",
+      magicLabel:"Marker word · opt.", genBtn:"Generate", letterCap:"Letter", copyBtn:"Copy", copied:"Copied",
+      placeholder:"Enter your free Groq key above and press Generate — the letter for the pasted posting will appear here.",
+      writing:"Writing…", why:"Why it fits: ", needKey:"Enter your free Groq key (console.groq.com).", needVac:"Paste the job posting."
+    }
+  };
+  let uiLang = localStorage.getItem('ui_lang') || 'ru';
+  function applyLang(l){
+    uiLang = l; localStorage.setItem('ui_lang', l); const t = I18N[l];
+    document.querySelectorAll('[data-i18n]').forEach(e => { const k = e.dataset.i18n; if(t[k]!=null) e.textContent = t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(e => { const k = e.dataset.i18nPh; if(t[k]!=null) e.placeholder = t[k]; });
+    $('langBtn').textContent = l === 'ru' ? 'EN' : 'RU';
+    root.setAttribute('lang', l);
+    if(!$('letter').dataset.filled) $('letter').textContent = t.placeholder;
+  }
+  $('langBtn').onclick = () => applyLang(uiLang === 'ru' ? 'en' : 'ru');
+
+  function applyTheme(th){
+    root.setAttribute('data-theme', th); localStorage.setItem('ui_theme', th);
+    $('themeIcon').innerHTML = th === 'dark'
+      ? '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
+      : '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  }
+  $('themeBtn').onclick = () => applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+
+  applyTheme(localStorage.getItem('ui_theme') || 'light');
+  applyLang(uiLang);
+
+  const SYSTEM = "You are a professional career assistant that writes concise, tailored cover letters. You never invent facts, skills or experience not supported by the candidate's CV. You output STRICT JSON only, with no markdown fences.";
   $('key').value = localStorage.getItem('groq_key') || '';
   $('key').addEventListener('change', () => localStorage.setItem('groq_key', $('key').value.trim()));
-
   $('cv').value =
 `Stepan Bedin — Junior Developer (Python).
 Skills: Python, FastAPI, aiogram, SQL/SQLite, REST APIs, automation, Docker, Git; some React/TypeScript.
 Projects: AI Job-Hunter (multi-source job aggregator with LLM scoring), YFB Store (Telegram Mini App e-commerce, 110 tests, CI/CD), freelance bots & websites (NOVACODE).
 English: intermediate (B1). Looking for a junior remote role in development or data analysis. Interested in crypto, data and AI.`;
   $('vacancy').value = "Junior Python Developer (internship, remote). Basic Python, Git, eagerness to learn. Training provided.";
-  $('letter').textContent = "Введите бесплатный ключ Groq выше и нажмите «Сгенерировать» — здесь появится письмо под вставленную вакансию.";
-  $('out').classList.add('show');
 
-  function prompt_(v, cv, lang, magic){
+  const LEN = { short:"about 120 words", medium:"about 180 words", detailed:"about 230 words" };
+  function buildPrompt(v, cv, lang, magic, tone, length){
     const L = lang === 'ru' ? 'Russian' : 'English';
     const mg = magic.trim() ? `\nIMPORTANT: include this exact word naturally somewhere: "${magic.trim()}".` : '';
-    return `Write a cover letter in ${L}, based ONLY on the candidate's CV.\nLength 150-220 words, professional, specific to the role, highlight overlapping skills, no fabrication.${mg}\n\nCANDIDATE CV:\n${cv.trim()}\n\nJOB POSTING:\n${v.trim()}\n\nReturn STRICT JSON: {"letter": "<full cover letter text>", "match_summary": "<1-2 sentences on why the candidate fits>"}`;
+    return `Write a cover letter in ${L}, based ONLY on the candidate's CV.\nTone: ${tone}. Length: ${LEN[length]}. Professional structure, specific to the role, highlight overlapping skills, no fabrication.${mg}\n\nCANDIDATE CV:\n${cv.trim()}\n\nJOB POSTING:\n${v.trim()}\n\nReturn STRICT JSON: {"letter": "<full cover letter text>", "match_summary": "<1-2 sentences on why the candidate fits>"}`;
   }
 
   $('go').addEventListener('click', async () => {
-    const key = $('key').value.trim();
+    const t = I18N[uiLang], key = $('key').value.trim();
     $('err').textContent = '';
-    if (!key) { $('err').textContent = 'Введите бесплатный ключ Groq (console.groq.com).'; return; }
-    if (!$('vacancy').value.trim()) { $('err').textContent = 'Вставьте текст вакансии.'; return; }
-    const go = $('go'); go.disabled = true; go.textContent = 'Пишу…';
+    if(!key){ $('err').textContent = t.needKey; return; }
+    if(!$('vacancy').value.trim()){ $('err').textContent = t.needVac; return; }
+    const go = $('go'); go.disabled = true; go.textContent = t.writing;
     try {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method:'POST', headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
         body: JSON.stringify({ model:'openai/gpt-oss-20b', reasoning_effort:'low', temperature:0.5, max_tokens:1400,
-          messages:[{role:'system',content:SYSTEM},{role:'user',content:prompt_($('vacancy').value,$('cv').value,$('lang').value,$('magic').value)}] })
+          messages:[{role:'system',content:SYSTEM},{role:'user',content:buildPrompt($('vacancy').value,$('cv').value,$('lang').value,$('magic').value,$('tone').value,$('length').value)}] })
       });
       const data = await res.json();
-      if (!res.ok) { $('err').textContent = 'Groq: ' + (data.error?.message || res.status); }
+      if(!res.ok){ $('err').textContent = 'Groq: ' + (data.error?.message || res.status); }
       else {
         const content = data.choices[0].message.content || '';
         const m = content.match(/\{[\s\S]*\}/);
         const obj = m ? JSON.parse(m[0]) : { letter: content, match_summary: '' };
-        $('letter').textContent = obj.letter || content;
-        $('match').textContent = obj.match_summary ? 'Почему подходит: ' + obj.match_summary : '';
+        $('letter').textContent = obj.letter || content; $('letter').dataset.filled = '1';
+        $('match').textContent = obj.match_summary ? t.why + obj.match_summary : '';
         $('out').classList.add('show');
       }
-    } catch (e) { $('err').textContent = 'Ошибка: ' + e; }
-    go.disabled = false; go.textContent = 'Сгенерировать';
+    } catch(e){ $('err').textContent = 'Error: ' + e; }
+    go.disabled = false; go.textContent = I18N[uiLang].genBtn;
   });
 
   $('copy').addEventListener('click', () => {
     navigator.clipboard.writeText($('letter').textContent);
-    $('copy').textContent = 'Скопировано';
-    setTimeout(() => $('copy').textContent = 'Копировать', 1500);
+    $('copy').textContent = I18N[uiLang].copied;
+    setTimeout(() => $('copy').textContent = I18N[uiLang].copyBtn, 1500);
   });
 </script>
 </body>
