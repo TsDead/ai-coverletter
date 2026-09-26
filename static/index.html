@@ -4,74 +4,65 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Cover-Letter Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0c; --surface:#141417; --surface2:#1a1a1e; --border:#26262b;
-    --text:#ececed; --muted:#8b8b93; --faint:#5c5c64;
-    --accent:#c9a25b; --accent-dim:#a8843f; --ok:#7fb587; --bad:#c77b7b;
+    --bg:#F0F9FF; --card:#FFFFFF; --text:#0F172A; --muted:#475569; --faint:#94A3B8;
+    --sky-500:#0EA5E9; --sky-600:#0284C7; --sky-700:#0369A1;
+    --border:#E0F0F8; --border-2:#D6ECF7; --muted-bg:#EFF7FB; --bad:#DC2626;
+    --shadow:0 1px 2px rgba(2,132,199,.06), 0 10px 30px rgba(2,132,199,.08);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);
-       font-family:ui-sans-serif,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
-       line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:820px;margin:0 auto;padding:56px 24px 80px}
-  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
-  h1{font-size:29px;font-weight:650;letter-spacing:-.02em;margin:10px 0 8px}
-  .lede{color:var(--muted);margin:0 0 30px;max-width:62ch}
-  .label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
-  textarea,input,select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;
-       color:var(--text);padding:12px 14px;font:inherit;font-size:14.5px;resize:vertical;transition:border-color .15s}
-  textarea{min-height:200px;line-height:1.5}
+  body{margin:0;color:var(--text);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+       font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;
+       background:radial-gradient(1100px 520px at 50% -180px, #DBF1FE 0%, rgba(219,241,254,0) 70%),linear-gradient(180deg,#F5FBFF 0%, #F0F9FF 100%)}
+  .wrap{max-width:840px;margin:0 auto;padding:60px 24px 90px}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sky-600);font-weight:600}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:10px 0 10px;color:#0B3A54}
+  .lede{color:var(--muted);margin:0 0 32px;max-width:60ch}
+  .label{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
+  textarea,input,select{width:100%;background:var(--card);border:1px solid var(--border-2);border-radius:12px;color:var(--text);padding:13px 15px;font:inherit;font-size:14.5px;resize:vertical;transition:border-color .18s, box-shadow .18s}
+  textarea{min-height:200px;line-height:1.55}
   textarea::placeholder,input::placeholder{color:var(--faint)}
-  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent-dim)}
-  select{appearance:none;cursor:pointer}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--sky-500);box-shadow:0 0 0 4px rgba(14,165,233,.14)}
+  select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230284C7' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
   @media(max-width:720px){.grid{grid-template-columns:1fr}}
-  .row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;align-items:flex-end}
-  .row > div{flex:1;min-width:150px}
-  button{font:inherit;font-size:14.5px;font-weight:600;border-radius:9px;padding:11px 22px;cursor:pointer;
-         border:1px solid var(--accent);background:var(--accent);color:#17130a;transition:.15s}
-  button:hover{background:#d8b06a} button:disabled{opacity:.45;cursor:default}
-  .out{margin-top:26px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px 20px;display:none}
+  .controls{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;align-items:flex-end}
+  .controls > div{flex:1;min-width:150px}
+  button{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;border-radius:12px;padding:12px 26px;cursor:pointer;border:1px solid var(--sky-700);background:var(--sky-700);color:#fff;transition:background .18s, transform .06s;box-shadow:0 6px 16px rgba(3,105,161,.24)}
+  button:hover{background:var(--sky-600)} button:active{transform:translateY(1px)} button:disabled{opacity:.5;cursor:default;box-shadow:none}
+  .out{margin-top:28px;background:var(--card);border:1px solid var(--border-2);border-radius:16px;padding:22px 24px;display:none;box-shadow:var(--shadow)}
   .out.show{display:block}
-  .bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
-  .bar .cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-  .copy{background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 13px;font-size:13px}
-  .copy:hover{border-color:var(--faint);background:var(--surface2)}
-  .letter{white-space:pre-wrap;font-size:15px;line-height:1.65}
-  .match{margin-top:14px;padding-top:13px;border-top:1px solid var(--border);color:var(--muted);font-size:14px}
+  .bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
+  .bar .cap{font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--sky-600);font-weight:600}
+  .copy{background:var(--muted-bg);border:1px solid var(--border-2);color:var(--sky-700);padding:7px 15px;font-size:13px;font-weight:600;box-shadow:none}
+  .copy:hover{background:#E3F2FB}
+  .letter{white-space:pre-wrap;font-size:15px;line-height:1.7;color:#1E293B}
+  .match{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:14px}
   .err{color:var(--bad);margin-top:14px;font-size:14px}
-  footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px}
-  footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--border)}
-  footer a:hover{color:var(--text)}
+  footer{margin-top:46px;padding-top:22px;border-top:1px solid var(--border);color:var(--faint);font-size:12.5px}
+  footer a{color:var(--muted);text-decoration:none} footer a:hover{color:var(--sky-600)}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">Cover-Letter Generator</div>
   <h1>Сопроводительное письмо под вакансию</h1>
-  <p class="lede">Вставьте вакансию и резюме — модель напишет письмо под неё: подсветит совпадающие навыки, вставит нужное слово-маркер и не выдумает фактов сверх резюме. EN / RU.</p>
+  <p class="lede">Вставьте вакансию и резюме — модель напишет письмо под неё: подсветит совпадающие навыки, вставит нужное слово-маркер и не выдумает фактов сверх резюме. English / Русский.</p>
 
   <div class="grid">
-    <div>
-      <div class="label">Вакансия</div>
-      <textarea id="vacancy" placeholder="Вставьте текст вакансии…"></textarea>
-    </div>
-    <div>
-      <div class="label">Резюме</div>
-      <textarea id="cv"></textarea>
-    </div>
+    <div><div class="label">Вакансия</div><textarea id="vacancy" placeholder="Вставьте текст вакансии…"></textarea></div>
+    <div><div class="label">Резюме</div><textarea id="cv"></textarea></div>
   </div>
 
-  <div class="row">
-    <div style="max-width:170px">
-      <div class="label">Язык письма</div>
-      <select id="lang"><option value="en">English</option><option value="ru">Русский</option></select>
-    </div>
-    <div>
-      <div class="label">Слово-маркер · опц.</div>
-      <input id="magic" placeholder="напр. SOLICITOUSLY">
-    </div>
+  <div class="controls">
+    <div style="max-width:180px"><div class="label">Язык письма</div>
+      <select id="lang"><option value="en">English</option><option value="ru">Русский</option></select></div>
+    <div><div class="label">Слово-маркер · опц.</div><input id="magic" placeholder="напр. SOLICITOUSLY"></div>
     <div style="flex:0 0 auto"><button id="go">Сгенерировать</button></div>
   </div>
 
@@ -83,11 +74,9 @@
     <div class="match" id="match"></div>
   </div>
 
-  <footer>
-    Python · FastAPI · LLM (Groq) &nbsp;·&nbsp;
-    <a href="https://github.com/TsDead/ai-coverletter" target="_blank">github.com/TsDead/ai-coverletter</a> &nbsp;·&nbsp;
-    <a href="https://new-coder.ru" target="_blank">new-coder.ru</a>
-  </footer>
+  <footer>Python · FastAPI · LLM (Groq) &nbsp;·&nbsp;
+    <a href="https://github.com/TsDead/ai-coverletter" target="_blank" rel="noopener">github.com/TsDead/ai-coverletter</a> &nbsp;·&nbsp;
+    <a href="https://new-coder.ru" target="_blank" rel="noopener">new-coder.ru</a></footer>
 </div>
 
 <script>
@@ -97,7 +86,6 @@
 Skills: Python, FastAPI, aiogram, SQL/SQLite, REST APIs, automation, Docker, Git; some React/TypeScript.
 Projects: AI Job-Hunter (multi-source job aggregator with LLM scoring), YFB Store (Telegram Mini App e-commerce, 110 tests, CI/CD), freelance bots & websites (NOVACODE).
 English: intermediate (B1). Looking for a junior remote role in development or data analysis. Interested in crypto, data and AI.`;
-
   $('go').addEventListener('click', async () => {
     const payload = { vacancy:$('vacancy').value, cv:$('cv').value, lang:$('lang').value, magic_word:$('magic').value };
     $('err').textContent = '';
@@ -107,19 +95,13 @@ English: intermediate (B1). Looking for a junior remote role in development or d
       const res = await fetch('/api/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
       const data = await res.json();
       if (data.error) { $('err').textContent = data.error; }
-      else {
-        $('letter').textContent = data.letter;
-        $('match').textContent = data.match_summary ? 'Почему подходит: ' + data.match_summary : '';
-        $('out').classList.add('show');
-      }
+      else { $('letter').textContent = data.letter; $('match').textContent = data.match_summary ? 'Почему подходит: ' + data.match_summary : ''; $('out').classList.add('show'); }
     } catch (e) { $('err').textContent = 'Ошибка сети: ' + e; }
     go.disabled = false; go.textContent = 'Сгенерировать';
   });
-
   $('copy').addEventListener('click', () => {
     navigator.clipboard.writeText($('letter').textContent);
-    $('copy').textContent = 'Скопировано';
-    setTimeout(() => $('copy').textContent = 'Копировать', 1500);
+    $('copy').textContent = 'Скопировано'; setTimeout(() => $('copy').textContent = 'Копировать', 1500);
   });
 </script>
 </body>
