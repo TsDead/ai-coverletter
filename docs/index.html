@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Cover-Letter Generator</title>
+<style>
+  :root{ --bg:#0e1016; --card:#171a22; --line:#272c38; --text:#e7eaf1; --muted:#9aa3b5;
+         --acc:#7c5cff; --acc2:#22d3ee; --grad:linear-gradient(120deg,#7c5cff,#22d3ee); }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(900px 500px at 80% -10%,rgba(124,92,255,.15),transparent 60%),var(--bg);
+       color:var(--text);font-family:'Segoe UI',system-ui,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 60px}
+  h1{font-size:clamp(24px,4vw,34px);margin:0 0 6px}
+  h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .key{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:20px}
+  .key label{font-size:13px}
+  .key a{color:var(--acc2);text-decoration:none}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.5px}
+  textarea,input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;
+       color:var(--text);padding:12px 14px;font:inherit;font-size:14px;resize:vertical}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--acc)}
+  textarea{min-height:190px}
+  .row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;align-items:flex-end}
+  .row > div{flex:1;min-width:150px}
+  button{background:var(--grad);color:#0b0d12;border:0;border-radius:12px;padding:13px 26px;
+       font-weight:800;font-size:15px;cursor:pointer;transition:.15s}
+  button:hover{filter:brightness(1.08)} button:disabled{opacity:.5;cursor:default}
+  .out{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:none}
+  .out.show{display:block}
+  .out h3{margin:0 0 10px;font-size:14px;color:var(--acc2);text-transform:uppercase;letter-spacing:1px}
+  .letter{white-space:pre-wrap;font-size:15px;line-height:1.6}
+  .match{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+  .bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
+  .copy{background:transparent;border:1px solid var(--line);color:var(--text);padding:6px 14px;font-size:13px;font-weight:600}
+  .copy:hover{border-color:var(--acc2)}
+  .err{color:#f87171;margin-top:16px}
+  .foot{margin-top:28px;color:var(--muted);font-size:12px;text-align:center}
+  .foot a{color:var(--acc2);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span>AI</span> Cover-Letter Generator</h1>
+  <p class="sub">Вставь вакансию и резюме → нейросеть напишет сопроводительное письмо под неё. EN/RU, без выдумок, с нужным словом-маркером.</p>
+
+  <div class="key">
+    <label>🔑 Твой бесплатный ключ Groq (без карты, <a href="https://console.groq.com" target="_blank">console.groq.com</a>) — хранится только в твоём браузере</label>
+    <input id="key" type="password" placeholder="gsk_..." style="margin-top:8px">
+  </div>
+
+  <div class="grid">
+    <div>
+      <label>Вакансия / Job posting</label>
+      <textarea id="vacancy" placeholder="Вставь текст вакансии…"></textarea>
+    </div>
+    <div>
+      <label>Твоё резюме / CV</label>
+      <textarea id="cv"></textarea>
+    </div>
+  </div>
+
+  <div class="row">
+    <div style="max-width:160px">
+      <label>Язык письма</label>
+      <select id="lang"><option value="en">English</option><option value="ru">Русский</option></select>
+    </div>
+    <div>
+      <label>Слово-маркер (опц.)</label>
+      <input id="magic" placeholder="например SOLICITOUSLY">
+    </div>
+    <div style="flex:0 0 auto">
+      <button id="go">Сгенерировать</button>
+    </div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <div class="out" id="out">
+    <div class="bar">
+      <h3>Сопроводительное письмо</h3>
+      <button class="copy" id="copy">Копировать</button>
+    </div>
+    <div class="letter" id="letter"></div>
+    <div class="match" id="match"></div>
+  </div>
+
+  <p class="foot">Работает на бесплатной LLM (Groq), вызов из браузера с твоим ключом. Код: <a href="https://github.com/TsDead/ai-coverletter" target="_blank">github.com/TsDead/ai-coverletter</a> · <a href="https://new-coder.ru" target="_blank">new-coder.ru</a></p>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const SYSTEM = "You are a professional career assistant that writes concise, tailored cover letters. You never invent facts, skills or experience not supported by the candidate's CV. You output STRICT JSON only, with no markdown fences.";
+
+  // ключ хранится только локально
+  $('key').value = localStorage.getItem('groq_key') || '';
+  $('key').addEventListener('change', () => localStorage.setItem('groq_key', $('key').value.trim()));
+
+  // предзаполнение + пример на старте
+  $('cv').value =
+`Stepan Bedin — Junior Developer (Python).
+Skills: Python, FastAPI, aiogram, SQL/SQLite, REST APIs, automation, Docker, Git; some React/TypeScript.
+Projects: AI Job-Hunter (multi-source job aggregator with LLM scoring), YFB Store (Telegram Mini App e-commerce, 110 tests, CI/CD), freelance bots & websites (NOVACODE).
+English: intermediate (B1). Looking for a junior remote role in development or data analysis. Interested in crypto, data and AI.`;
+  $('vacancy').value = "Junior Python Developer (internship, remote). Basic Python, Git, eagerness to learn. Training provided.";
+  $('letter').textContent = "Введи свой бесплатный ключ Groq выше и нажми «Сгенерировать» — здесь появится письмо под вставленную вакансию.";
+  $('out').classList.add('show');
+
+  function prompt_(v, cv, lang, magic){
+    const L = lang === 'ru' ? 'Russian' : 'English';
+    const mg = magic.trim() ? `\nIMPORTANT: include this exact word naturally somewhere: "${magic.trim()}".` : '';
+    return `Write a cover letter in ${L}, based ONLY on the candidate's CV.\nLength 150-220 words, professional, specific to the role, highlight overlapping skills, no fabrication.${mg}\n\nCANDIDATE CV:\n${cv.trim()}\n\nJOB POSTING:\n${v.trim()}\n\nReturn STRICT JSON: {"letter": "<full cover letter text>", "match_summary": "<1-2 sentences on why the candidate fits>"}`;
+  }
+
+  $('go').addEventListener('click', async () => {
+    const key = $('key').value.trim();
+    $('err').textContent = '';
+    if (!key) { $('err').textContent = 'Введи бесплатный ключ Groq (console.groq.com).'; return; }
+    if (!$('vacancy').value.trim()) { $('err').textContent = 'Вставь текст вакансии.'; return; }
+    const go = $('go'); go.disabled = true; go.textContent = 'Пишу…';
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method:'POST', headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
+        body: JSON.stringify({ model:'openai/gpt-oss-20b', reasoning_effort:'low', temperature:0.5, max_tokens:1400,
+          messages:[{role:'system',content:SYSTEM},{role:'user',content:prompt_($('vacancy').value,$('cv').value,$('lang').value,$('magic').value)}] })
+      });
+      const data = await res.json();
+      if (!res.ok) { $('err').textContent = 'Groq: ' + (data.error?.message || res.status); }
+      else {
+        const content = data.choices[0].message.content || '';
+        const m = content.match(/\{[\s\S]*\}/);
+        const obj = m ? JSON.parse(m[0]) : { letter: content, match_summary: '' };
+        $('letter').textContent = obj.letter || content;
+        $('match').textContent = obj.match_summary ? '💡 ' + obj.match_summary : '';
+        $('out').classList.add('show');
+      }
+    } catch (e) { $('err').textContent = 'Ошибка: ' + e; }
+    go.disabled = false; go.textContent = 'Сгенерировать';
+  });
+
+  $('copy').addEventListener('click', () => {
+    navigator.clipboard.writeText($('letter').textContent);
+    $('copy').textContent = 'Скопировано ✓';
+    setTimeout(() => $('copy').textContent = 'Копировать', 1500);
+  });
+</script>
+</body>
+</html>
